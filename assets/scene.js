@@ -14,10 +14,11 @@
   try {
     renderer = new T.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
   } catch (e) { return fail(); }
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, mobile ? 1 : 1.25));
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, mobile ? 1 : 1));
   renderer.outputEncoding = T.sRGBEncoding;
   renderer.toneMapping = T.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
+  renderer.transmissionResolutionScale = 0.5;
   renderer.setClearColor(0x000000, 0);
   const canvas = renderer.domElement;
   canvas.className = 'gl-canvas';
@@ -46,7 +47,7 @@
     strips.add(m);
   }
   scene.add(strips);
-  const geo = new T.TorusKnotGeometry(1, 0.34, mobile ? 140 : 280, mobile ? 20 : 48, 2, 3);
+  const geo = new T.TorusKnotGeometry(1, 0.34, mobile ? 100 : 180, mobile ? 16 : 32, 2, 3);
   const mat = new T.MeshPhysicalMaterial({
     color: 0xffffff, metalness: 0, roughness: 0.035,
     transmission: 1, thickness: 1.6, ior: 1.46,

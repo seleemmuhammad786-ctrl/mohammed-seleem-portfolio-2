@@ -61,10 +61,13 @@
     s.addEventListener('pointerleave', () => prev.classList.remove('on'));
   });
   addEventListener('pointermove', e => { tx = e.clientX + 200; ty = e.clientY; });
+  let lastGl = 0, lastScroll = -1, idleFrames = 0;
   function frame(t) {
     if (lenis) lenis.raf(t);
     frameCount++;
     const uiTick = frameCount % 3 === 0;
+    const scrolled = scrollY !== lastScroll;
+    if (scrolled) { lastScroll = scrollY; idleFrames = 0; } else { idleFrames++; }
 
     const vh = innerHeight, m = mobile();
     const hp = progress(hero);
@@ -96,7 +99,10 @@
         const cp = progress(contact), a = io(map(cp, 0, .6));
         Object.assign(S.target, { x: 0, y: m ? lerp(.3, .55, a) : lerp(-.2, .1, a), s: m ? lerp(.3, .62, a) : lerp(.35, 1.05, a), rx: 4 + a * 1.4, ry: 7 + a * 2.4, strips: 1 - a });
       }
-      if (glOwner) S.render(t);
+      // Only redraw the WebGL scene when something actually changed:
+      // cap it near 30fps and stop entirely once the page is idle.
+      const glDue = (t - lastGl) > 32 && (scrolled || idleFrames < 40);
+      if (glOwner && glDue) { S.render(t); lastGl = t; }
     }
     projects.forEach(p => {
       if (!inView(p.el)) { p.el.classList.remove('active'); return; }
